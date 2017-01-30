@@ -54,6 +54,8 @@ Example: `echo -e "AWS_PRD_PROFILE=(name-of-aws-profile-you-just-created)" > adm
 
 You will need to run `npm run sls project init -c` to setup the project. Note you will need to add a `-r REGION (i.e. ap-southeast-2)` if you wish to depoy your lambda function to somewhere other then Virginia.
 
+**NOTE** If you're not running multiple environments we suggest entering the name `prd` for your Serverless Stage for the project.
+
 Serverless will then go and setup the IAM user to run your lambda function... Note if you wish to change them from the default configuration you will need to update the CloudFormation template `s-resources-cf.json` file.
 
 ### Deploy all the things!
@@ -63,7 +65,9 @@ Finally we can run the commands to actually deploy the Lambda & API Gateway code
 To deploy:
 `npm run sls dash deploy`
 
-_Note_ You will need to deploy the Endpoint before deploying the function ... The easiest way to do this is to just select both the function and the endpoint when deploying, and if the deploy fails - run the `npm run sls dash deploy` command a 2nd timen (which should then work).
+_Note_ You may need to deploy the _POST_ and _OPTIONS_ Endpoint before deploying the function ... The easiest way to do this is to just select the function and both endpoint's when deploying, and if the deploy fails - run the `npm run sls dash deploy` command a 2nd time (which should then work).
+
+**NOTE** Take note of the API URL that is returned after deploying... (it will look something like _https://asd123asd123.execute-api.us-east-1.amazonaws.com/prd/send-email_) ... You will need to set this API endpoint later in your front-end code.
 
 ## Configuration
 
@@ -83,8 +87,8 @@ You will also need to create a file called: `email-mapping.json` and place it in
 
 Log into your AWS Console, and open the Lambda function that we just deployed... You will need to configure/set the following Environment Variables:
 
-- S3BUCKET - _This is the name of the S3 bucket that the `email-mapping.json` file is read from..._
-- FROM_EMAIL - \_This is the email address that you will receive email from - it should be a verified email in AWS SES or from one of your verified domains._
+- `S3BUCKET` - _This is the name of the S3 bucket that the `email-mapping.json` file is read from..._
+- `FROM_EMAIL` - _This is the email address that you will receive email from - it should be a verified email in AWS SES or from one of your verified domains._
 
 ## <a name="running">Running Locally</a>
 
