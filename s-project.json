@@ -1,0 +1,16 @@
+{
+  "name": "email-api",
+  "custom": {},
+    "plugins": [
+        "serverless-serve",
+        "serverless-optimizer-plugin",
+        "serverless-cors-plugin"
+    ],
+    "custom": {
+        "excludePatterns": [],
+        "cors": {
+            "allowOrigin": "*",
+            "allowHeaders": ["Content-Type", "X-Amz-Date", "Authorization", "X-Api-Key"]
+        }
+    }
+}

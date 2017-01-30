@@ -1,0 +1,27 @@
+{
+  "name": "email-api",
+  "version": "1.0.2",
+  "description": "A lightweight API to send emails via API Gateway.",
+  "author": "David Nedved",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "nodemon -x 'sls serve start --port=3008'",
+    "install": "bash configuration/package.sls-install.sh",
+    "sls": "sls",
+    "md": "mos",
+    "?md": "echo \"Update the markdown files\""
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.3.10",
+    "mos": "^1.3.0",
+    "nodemon": "^1.9.2",
+    "serverless": "^0.5.5",
+    "serverless-cors-plugin": "^0.4.1",
+    "serverless-optimizer-plugin": "^2.5.1",
+    "serverless-serve": "^1.7.2"
+  },
+  "mos": {
+    "shields": false
+  }
+}
