@@ -9,7 +9,6 @@ aws.config.region = process.env.SERVERLESS_REGION || 'us-east-1'; // Virginia
 var S3BUCKET = process.env.S3BUCKET || 'website-configuration';
 var FROM_EMAIL = process.env.FROM_EMAIL || 'no-reply@domain.com';
 
-
 // load AWS SES
 var ses = new aws.SES({apiVersion: '2010-12-01'});
 var s3 = new aws.S3();
@@ -53,6 +52,11 @@ module.exports.handler = function(event, context, cb) {
             else if(emailBody.subject) { var emailSubject = emailBody.SUBJECT }
             else if(emailBody.Subject) { var emailSubject = emailBody.SUBJECT }
             else { var emailSubject = "New email from website contact form." }
+
+            if(emailBody.email) { var replyToEmail = emailBody.email }
+            if(emailBody.Email) { var replyToEmail = emailBody.Email }
+            if(emailBody.EMAIL) { var replyToEmail = emailBody.EMAIL }
+            else { var replyToEmail = FROM_EMAIL }
 
             // Convert 'object' into a pretty plain-text string that will be sent in the email to the user...
             var emailTextData = "";
@@ -100,7 +104,10 @@ module.exports.handler = function(event, context, cb) {
                            Data: emailTextData,
                        }
                    }
-               }
+               },
+               ReplyToAddresses: [
+                   replyToEmail
+               ]
             };
 
             // this sends the email
