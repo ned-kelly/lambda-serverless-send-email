@@ -1,7 +1,7 @@
 {
     "from": "no-reply@your-domain.com",
     "recipients": {
-        "sales": {
+        "general-query": {
             "to": "example@example.com",
             "subject": "[My Site] Website Contact Form" 
         }
