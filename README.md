@@ -11,7 +11,7 @@ This project uses Docker to simplify getting up and running / testing locally.
 [![GitHub issues](https://img.shields.io/github/issues/david-nedved/lambda-serverless-send-email.svg)]()
 [![GitHub](https://img.shields.io/github/license/david-nedved/lambda-serverless-send-email.svg)]()
 [![serverless](http://public.serverless.com/badges/v3.svg)](http://www.serverless.com/)
-[![docker](https://img.shields.io/badge/Docker%20Compose-2.0-blue.svg?logo=docker)]()
+[![docker](https://img.shields.io/badge/Docker%20Compose-2.0-blue.svg?longCache=true&style=flat&logo=docker)]()
 
 ## Prerequisites
 
@@ -19,7 +19,7 @@ This project uses Docker to simplify getting up and running / testing locally.
 - Docker - [Download installer here](https://www.docker.com/)
 - Docker Compose - See [Install Instructions](https://docs.docker.com/compose/install/) here.
 
-## Setup
+## Setup & Configuraiton
 
 ### Prepare and configure AWS profile
 
@@ -35,11 +35,13 @@ If you're on windows you may just run: `docker-compose up --build` rather than t
 
 You will need to edit the `functions/email/config.json` file to reflect the correct "from", "to" and "subject" lines - When we call the API, emails are only accepted to the object's key (by default it's `general-query` to prevent people from using this API to spam the world...
 
-### Test locally - then once you're happy you can deploy to AWS!
+### Test locally
 
-Finally we can run the commands to actually deploy the Lambda & API Gateway code!
+By default, you can test by performing a HTTP Post request to: `http://127.0.0.1:3003/api/send-email`. See below for an example of what the JSON Payload should look like under the "Implementing" section.
 
-To deploy run: `./deploy.sh` - Note that you will need to change/configure the `AWS_PROFILE` from "default" to your preferred profile if you're using a non-default profile for your API keys (this applies to all files in the `/functions/` directory also.
+## Deploying to AWS
+
+To deploy run: `./deploy.sh` - Note that you will need to change/configure the `AWS_PROFILE` from "default" to your preferred profile if you're using a non-default profile (This applies to the `serverless.yml`, `deploy.sh`, & `docker-compose.yml` files)
 
 **NOTE** Take note of the API URL that is returned after deploying... (it will look something like _https://xxxxxxxxxxxxxxxxxx.execute-api.us-east-1.amazonaws.com/prd/send-email_) ... You will need to set this API endpoint later in your front-end code.
 
@@ -49,74 +51,85 @@ To deploy run: `./deploy.sh` - Note that you will need to change/configure the `
 
 There are no specific required fields to be posted to the API, other than `recipient` which needs to match the object key as specified in your `functions/email/config.json` file (so by default it's `general-query`). All other items that are passed through will be delivered in your email as a line item.
 
-An example of what the API Post request could look like is as follows:
+An API Post request should consist of the `recipient` matching whatever user & subject you want to send to in your `config.json`, followed by the body of the email specified as a JSON Object with the key: `data`:
 
+```json
+{
+    "recipient": "general-query",
+    "data": {
+        "some key": "this is the first value",
+        "some other field": "some value"
+    }
+}
 ```
-xxx
+
+**An example posting to the API (Locally) via CURL can be performed like so:**
+
+```bash
+curl -X POST \
+  http://127.0.0.1:3003/api/send-email \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "recipient": "general-query",
+    "data": {
+        "body": "test email",
+        "some field": "some other text..."
+    }
+}'
 ```
 
 ### Example HTML Form
-    <form id="submitForm">
-        Department:
-        <select name="department">
-            <option value="Sales">Sales</option>
-            <option value="Support">Support</option>
-            <option value="Administration">Administration</option>
-        </select>
 
-        <br />
+Once you're happy with the API, you can implement to your website using your favourite Javascript Framework. Here's an example using jQuery:
 
-        First Name: <input type="text" name="first-name" value="" /><br />
-        Last Name: <input type="text" name="last-name" value="" /><br />
-        Email: <input type="text" name="email" value="" /><br />
-        Phone: <input type="text" name="phone" value="" /><br />
+```html
+<form id="submitForm">
+    First Name: <input type="text" name="first-name" value="" /><br />
+    Last Name: <input type="text" name="last-name" value="" /><br />
+    Email: <input type="text" name="email" value="" /><br />
+    Phone: <input type="text" name="phone" value="" /><br />
 
-        Comments: <textarea name="comments"></textarea>
-        
-        <input type="submit" value="SEND" />
-    </form>
+    Comments: <textarea name="comments"></textarea>
+    
+    <input type="submit" value="SEND" />
+</form>
 
-    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-        // Bind to your HTML form's submit button...
-        jQuery("#submitForm").submit(function(e) {
-            e.preventDefault();
+<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+<script type="text/javascript">
+    // Bind to your HTML form's submit button...
+    jQuery("#submitForm").submit(function(e) {
+        e.preventDefault();
 
-            // Get value of each element...
-            var formData = {}
-            var apiGatewayEndpoint = ""; // Example: qazxsw123123.execute-api.us-east-1.amazonaws.com
+        // Get value of each element...
+        var formData = {
+            "recipient": "general-query",
+            data: {}
+        }
+        var apiGatewayEndpoint = ""; // Example: https://xxxxxxxxxxxxx.execute-api.us-east-1.amazonaws.com/
 
-            formData.To = jQuery("select[name=department]").val();
-            formData.FirstName = jQuery("input[name=first-name]").val();
-            formData.LastName = jQuery("input[name=last-name]").val();
-            formData.Email = jQuery("input[name=email]").val();
-            formData.Phone = jQuery("input[name=phone]").val();
-            formData.Comments = jQuery("textarea[name=comments]").val();
+        formData.data.FirstName = jQuery("input[name=first-name]").val();
+        formData.data.LastName = jQuery("input[name=last-name]").val();
+        formData.data.Email = jQuery("input[name=email]").val();
+        formData.data.Phone = jQuery("input[name=phone]").val();
+        formData.data.Comments = jQuery("textarea[name=comments]").val();
 
-            formData.SUBJECT = "Contact form from your website to: [" + formData.To + "] department.";
+        jQuery.ajax({
+            type: 'POST',
+            url: 'https://' + apiGatewayEndpoint + '/prod/api/send-email',
+            crossDomain: true,
+            data: JSON.stringify(formData),
+            dataType: 'json',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            success: function(responseData, textStatus, jqXHR) {
+                console.log('response from api: ' + responseData);
+            },
+            error: function(responseData, textStatus, errorThrown) {
+                console.log('ERROR! - ' + errorThrown + ', response from api: ' + responseData);
+            }
+        });
 
-            jQuery.ajax({
-                type: 'POST',
-                url: 'https://' + apiGatewayEndpoint + '/prd/send-email',
-                crossDomain: true,
-                data: JSON.stringify(formData),
-                dataType: 'json',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                success: function(responseData, textStatus, jqXHR) {
-                    console.log('response from api: ' + responseData);
-                    if (responseData.success == true) {
-                        console.log("Form successfully submitted!");
-                    } else {
-                        console.log("ERROR! - Form successfully submitted, but Lambda Function returned an error (see Cloudwatch Logs for details)");
-                    }
-                },
-                error: function(responseData, textStatus, errorThrown) {
-                    console.log('ERROR! - ' + errorThrown + ', response from api: ' + responseData);
-                }
-            });
-
-        })
-    </script>
+    })
+</script>
 ```
