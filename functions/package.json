@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "@types/aws-lambda": "0.0.16",
+    "@types/aws-sdk": "0.0.42",
+    "@types/node": "7.0.8",
+    "awesome-typescript-loader": "3.2.3",
+    "aws-sdk": "2.28.0",
+    "gulp": "3.9.1",
+    "gulp-util": "3.0.8",
+    "json-loader": "0.5.4",
+    "serverless": "1.23.0",
+    "serverless-offline": "3.16.0",
+    "tslint": "4.5.1",
+    "typescript": "2.5.3",
+    "webpack": "2.2.1"
+  }
+}

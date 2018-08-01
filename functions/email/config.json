@@ -1,0 +1,9 @@
+{
+    "from": "no-reply@your-domain.com",
+    "recipients": {
+        "sales": {
+            "to": "example@example.com",
+            "subject": "[My Site] Website Contact Form" 
+        }
+    }
+}

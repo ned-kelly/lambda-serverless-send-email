@@ -1,0 +1,21 @@
+version: '2'
+services:
+  email-api:
+    image: email-api:local
+    hostname: email-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - ./functions:/var/functions
+      - /var/functions/node_modules
+      - ~/.aws/credentials:/root/.aws/credentials #Map host machine credentials
+    environment:
+      - AWS_PROFILE=default
+      - SERVERLESS_STAGE=prod
+      - AWS_REGION=us-east-1
+    ports:
+      - "3003:80" #Serverless Serve
+    #Host 0.0.0.0 is important as it isn't bound to all adapters be default
+    command: /var/functions/run.sh

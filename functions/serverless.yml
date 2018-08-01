@@ -1,0 +1,39 @@
+service: email-api
+frameworkVersion: ">=1.1.0 <2.0.0"
+
+plugins:
+  - serverless-offline
+
+package:
+  exclude:
+    - "*/**" #Exclude every file then whitelist
+  include:
+    - data/** #All the supporting data
+    - dist/** #Everything bundled into a single js file
+
+provider:
+  name: aws
+  runtime: nodejs4.3
+  stage: stg
+  environment:
+    SERVERLESS_REGION: "${opt:region, self:provider.region}"
+    SERVERLESS_STAGE: "${opt:stage, self:provider.stage}"
+    AWS_PROFILE: "default"
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - ses:SendEmail
+        - ses:SendRawEmail
+      Resource:
+        - "*"
+
+functions:
+  send-email:
+    handler: dist/email/handler.handler
+    timeout: 20
+    memorySize: 256
+    events:
+      - http:
+          path: api/send-email
+          method: post
+          cors: true
